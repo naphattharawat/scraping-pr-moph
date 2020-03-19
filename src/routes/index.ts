@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
 import { Jwt } from '../models/jwt';
-import * as osmosis from 'osmosis';
+var osmosis = require('osmosis');
 import * as HttpStatus from 'http-status-codes';
 
 const jwt = new Jwt();

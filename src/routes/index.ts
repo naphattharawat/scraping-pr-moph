@@ -1,10 +1,9 @@
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
-import { Jwt } from '../models/jwt';
+
 var osmosis = require('osmosis');
 import * as HttpStatus from 'http-status-codes';
 
-const jwt = new Jwt();
 
 const router: Router = Router();
 
@@ -31,7 +30,34 @@ router.get('/', (req: Request, res: Response) => {
           l.img = `https://pr.moph.go.th/${l.img}`;
           l.link = `https://pr.moph.go.th${l.link}`;
         }
-        res.send({ ok: true, rows: list });
+        res.send({ ok: true, rows: list, source_by: 'https://pr.moph.go.th/?url=pr/index/2/04/' });
+
+      })
+    // res.send('<h1>Hello Fucking World</h1>');
+  } catch (error) {
+    res.send({ ok: false, error: error });
+  }
+});
+
+router.get('/infographic', (req: Request, res: Response) => {
+  try {
+    let list = [];
+    osmosis
+      .get('https://www.moph.go.th/index.php/news/infographic')
+      .find('div.thumbnail')
+      .set({
+        'thumb': 'img@src',
+        'link': 'a@href',
+        'title': 'a@title'
+      })
+      .data(function (data) {
+        list.push(data);
+      })
+      .done(function () {
+        for (const l of list) {
+          l.img = l.thumb.replace('/thumb', '');
+        }
+        res.send({ ok: true, rows: list, source_by: 'https://www.moph.go.th/index.php/news/infographic' });
 
       })
     // res.send('<h1>Hello Fucking World</h1>');

@@ -14,16 +14,14 @@ import * as cors from 'cors';
 import Knex = require('knex');
 import { MySqlConnectionConfig } from 'knex';
 import { Router, Request, Response, NextFunction } from 'express';
-import { Jwt } from './models/jwt';
+
 
 import indexRoute from './routes/index';
-import loginRoute from './routes/login';
-import requestRoute from './routes/request';
+
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
 
-const jwt = new Jwt();
 
 //view engine setup
 app.set('views', path.join(__dirname, '../views'));
@@ -69,32 +67,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-let checkAuth = (req: Request, res: Response, next: NextFunction) => {
-  let token: string = null;
 
-  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-    token = req.headers.authorization.split(' ')[1];
-  } else if (req.query && req.query.token) {
-    token = req.query.token;
-  } else {
-    token = req.body.token;
-  }
 
-  jwt.verify(token)
-    .then((decoded: any) => {
-      req.decoded = decoded;
-      next();
-    }, err => {
-      return res.send({
-        ok: false,
-        error: HttpStatus.getStatusText(HttpStatus.UNAUTHORIZED),
-        code: HttpStatus.UNAUTHORIZED
-      });
-    });
-}
-
-app.use('/login', loginRoute);
-app.use('/api', checkAuth, requestRoute);
 app.use('/', indexRoute);
 
 //error handlers
